@@ -165,8 +165,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Implementação do EmailJS para envio do Formulário
-const PUBLIC_KEY = "bNhEayiZXAy1MU0km"; // Chave Pública REAL
-const SERVICE_ID = "service_2nkt1a3"; // NOVO SERVICE ID CORRIGIDO
+const PUBLIC_KEY = "bNhEayiZXAy1MU0km"; 
+const SERVICE_ID = "service_fhse5da"; // CORRIGIDO!
 const TEMPLATE_ID = "template_unccsst"; 
 
 // Inicializa o EmailJS

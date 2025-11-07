@@ -78,52 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Contact form handling
-    const contactForm = document.getElementById('contatoForm');
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Get form data
-            const formData = new FormData(this);
-            const nome = formData.get('nome');
-            const email = formData.get('email');
-            const telefone = formData.get('telefone');
-            const servico = formData.get('servico');
-            const mensagem = formData.get('mensagem');
-
-            // Basic validation
-            if (!nome || !email || !telefone || !servico || !mensagem) {
-                showMessage('Por favor, preencha todos os campos obrigatórios.', 'error');
-                return;
-            }
-
-            if (!isValidEmail(email)) {
-                showMessage('Por favor, insira um e-mail válido.', 'error');
-                return;
-            }
-
-            if (!isValidPhone(telefone)) {
-                showMessage('Por favor, insira um telefone válido.', 'error');
-                return;
-            }
-
-            // Simulate form submission
-            const submitBtn = this.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            
-            submitBtn.textContent = 'Enviando...';
-            submitBtn.disabled = true;
-
-            setTimeout(() => {
-                showMessage(`Obrigado, ${nome}! Sua mensagem foi enviada com sucesso. Entraremos em contato em breve.`, 'success');
-                this.reset();
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            }, 2000);
-        });
-    }
-
     // Scroll animations
     const observerOptions = {
         threshold: 0.1,
@@ -164,9 +118,120 @@ document.addEventListener('DOMContentLoaded', function() {
     stats.forEach(stat => {
         statsObserver.observe(stat);
     });
+    
+    // Add WhatsApp floating button (maintained from previous code)
+    const whatsappButton = document.createElement('div');
+    whatsappButton.innerHTML = `
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.488"/>
+        </svg>
+    `;
+    whatsappButton.className = 'whatsapp-float';
+    whatsappButton.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        background: #25D366;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+        z-index: 1000;
+        transition: all 300ms ease;
+    `;
+    whatsappButton.onclick = openWhatsApp;
+    whatsappButton.title = 'Falar no WhatsApp';
+    document.body.appendChild(whatsappButton);
+    // Add hover effect
+    whatsappButton.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.1)';
+        this.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.4)';
+    });
+    whatsappButton.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+        this.style.boxShadow = '0 4px 12px rgba(37, 211, 102, 0.3)';
+    });
+
+    // NOVO: Adiciona o listener de submissão do formulário
+    const contactForm = document.getElementById('contatoForm');
+    if (contactForm) {
+        contactForm.addEventListener('submit', sendMail);
+    }
 });
 
-// Utility Functions
+// Implementação do EmailJS para envio do Formulário
+const PUBLIC_KEY = "bNhEayiZXAy1MU0km"; // Chave Pública REAL
+const SERVICE_ID = "service_03v4uq3"; 
+const TEMPLATE_ID = "template_unccsst"; 
+
+// Inicializa o EmailJS
+(function() {
+    // Verifica se o SDK do EmailJS foi carregado (para evitar erros)
+    if (typeof emailjs !== 'undefined') {
+        emailjs.init(PUBLIC_KEY);
+    } else {
+        console.error("EmailJS SDK not loaded.");
+    }
+})();
+
+function sendMail(event) {
+    // 1. Previne o comportamento padrão (recarregar a página)
+    event.preventDefault();
+
+    const form = event.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    
+    // 2. Coleta os dados do formulário
+    const templateParams = {
+        from_name: form.nome.value,
+        from_email: form.email.value,
+        telefone: form.telefone.value,
+        servico: form.servico.value,
+        message: form.mensagem.value,
+    };
+
+    // 3. Validação básica (usando suas funções utilitárias)
+    if (!templateParams.from_name || !templateParams.from_email || !templateParams.telefone || !templateParams.servico || !templateParams.message) {
+        showMessage('Por favor, preencha todos os campos obrigatórios.', 'error');
+        return;
+    }
+    if (!isValidEmail(templateParams.from_email)) {
+        showMessage('Por favor, insira um e-mail válido.', 'error');
+        return;
+    }
+    
+    // 4. Feedback visual e desabilita o botão
+    submitBtn.textContent = 'Enviando...';
+    submitBtn.disabled = true;
+
+    // 5. Envia o e-mail
+    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
+        .then(function(response) {
+            // Sucesso
+            console.log('SUCCESS!', response.status, response.text);
+            showMessage(`Obrigado, ${templateParams.from_name}! Sua mensagem foi enviada com sucesso. Entraremos em contato em breve.`, 'success');
+            form.reset(); // Limpa o formulário
+        }, function(error) {
+            // Falha
+            console.log('FAILED...', error);
+            showMessage('Falha ao enviar a mensagem. Por favor, tente novamente.', 'error');
+        })
+        .finally(function() {
+            // Restaura o botão
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        });
+}
+
+
+// --- Funções Auxiliares (mantidas e adaptadas) ---
+
 function scrollToSection(sectionId) {
     const section = document.getElementById(sectionId);
     const header = document.querySelector('.header');
@@ -207,6 +272,14 @@ function showMessage(message, type) {
     }
 }
 
+function openWhatsApp() {
+    const phone = '5545999639218'; // Phone number with country code
+    const message = encodeURIComponent('Olá! Gostaria de solicitar um orçamento para serviços de balanças.');
+    const whatsappUrl = `https://wa.me/${phone}?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+}
+
+// Restante das funções auxiliares (isValidEmail, isValidPhone, animateCounter)
 function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -237,70 +310,3 @@ function animateCounter(element, start, end, duration) {
     };
     requestAnimationFrame(step);
 }
-
-// Instagram integration
-function openInstagram() {
-    window.open('https://instagram.com/beckerautomacoes', '_blank');
-}
-
-// Add Instagram click handler
-document.addEventListener('DOMContentLoaded', function() {
-    const instagramContactItem = document.querySelector('.contato-item:last-child');
-    if (instagramContactItem) {
-        const instagramDetails = instagramContactItem.querySelector('.contato-details');
-        if (instagramDetails) {
-            instagramDetails.style.cursor = 'pointer';
-            instagramDetails.onclick = openInstagram;
-        }
-    }
-});
-
-// WhatsApp integration
-function openWhatsApp() {
-    const phone = '5545999639218'; // Phone number with country code
-    const message = encodeURIComponent('Olá! Gostaria de solicitar um orçamento para serviços de balanças.');
-    const whatsappUrl = `https://wa.me/${phone}?text=${message}`;
-    window.open(whatsappUrl, '_blank');
-}
-
-// Add WhatsApp floating button
-document.addEventListener('DOMContentLoaded', function() {
-    const whatsappButton = document.createElement('div');
-    whatsappButton.innerHTML = `
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.465 3.488"/>
-        </svg>
-    `;
-    whatsappButton.className = 'whatsapp-float';
-    whatsappButton.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        width: 60px;
-        height: 60px;
-        background: #25D366;
-        color: white;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
-        z-index: 1000;
-        transition: all 300ms ease;
-    `;
-    whatsappButton.onclick = openWhatsApp;
-    whatsappButton.title = 'Falar no WhatsApp';
-    document.body.appendChild(whatsappButton);
-
-    // Add hover effect
-    whatsappButton.addEventListener('mouseenter', function() {
-        this.style.transform = 'scale(1.1)';
-        this.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.4)';
-    });
-
-    whatsappButton.addEventListener('mouseleave', function() {
-        this.style.transform = 'scale(1)';
-        this.style.boxShadow = '0 4px 12px rgba(37, 211, 102, 0.3)';
-    });
-});

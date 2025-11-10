@@ -219,18 +219,18 @@
             </div>
             <div class="contato-content">
                 
-                <form class="contato-form" id="contatoForm" onsubmit="sendMail(event)">
+                <form class="contato-form" id="contatoForm" action="https://formsubmit.co/rod.il@hotmail.com" method="POST">
                     <div class="form-group">
-                        <input type="text" id="nome" name="nome" placeholder="Seu nome" required>
+                        <input type="text" id="nome" name="Nome" placeholder="Seu nome" required>
                     </div>
                     <div class="form-group">
-                        <input type="email" id="email" name="email" placeholder="Seu e-mail" required>
+                        <input type="email" id="email" name="Email" placeholder="Seu e-mail" required>
                     </div>
                     <div class="form-group">
-                        <input type="tel" id="telefone" name="telefone" placeholder="Seu telefone" required>
+                        <input type="tel" id="telefone" name="Telefone" placeholder="Seu telefone" required>
                     </div>
                     <div class="form-group">
-                        <select id="servico" name="servico" required>
+                        <select id="servico" name="Servico" required>
                             <option value="">Selecione o serviço</option>
                             <option value="manutencao">Manutenção</option>
                             <option value="calibracao">Calibração</option>
@@ -239,7 +239,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <textarea id="mensagem" name="mensagem" placeholder="Sua mensagem" rows="4" required></textarea>
+                        <textarea id="mensagem" name="Mensagem" placeholder="Sua mensagem" rows="4" required></textarea>
                     </div>
                     <button type="submit" class="btn-primary">Enviar Mensagem</button>
                 </form>
@@ -307,8 +307,6 @@
             </div>
         </div>
     </footer>
-
-    <script src="https://cdn.emailjs.com/sdk/2.3.2/email.min.js"></script>
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>

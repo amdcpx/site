@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
         statsObserver.observe(stat);
     });
     
-    // Add WhatsApp floating button (maintained from previous code)
+    // Add WhatsApp floating button 
     const whatsappButton = document.createElement('div');
     whatsappButton.innerHTML = `
         <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
@@ -157,78 +157,6 @@ document.addEventListener('DOMContentLoaded', function() {
         this.style.boxShadow = '0 4px 12px rgba(37, 211, 102, 0.3)';
     });
 
-    // NOVO: Adiciona o listener de submissão do formulário
-    const contactForm = document.getElementById('contatoForm');
-    if (contactForm) {
-        contactForm.addEventListener('submit', sendMail);
-    }
-});
-
-// Implementação do EmailJS para envio do Formulário
-const PUBLIC_KEY = "bNhEayiZXAy1MU0km"; 
-const SERVICE_ID = "service_fhse5da"; // CORRIGIDO!
-const TEMPLATE_ID = "template_unccsst"; 
-
-// Inicializa o EmailJS
-(function() {
-    // Verifica se o SDK do EmailJS foi carregado (para evitar erros)
-    if (typeof emailjs !== 'undefined') {
-        emailjs.init(PUBLIC_KEY);
-    } else {
-        console.error("EmailJS SDK not loaded. Verifique se o <script> do SDK está no index.html.");
-    }
-})();
-
-function sendMail(event) {
-    // 1. Previne o comportamento padrão (recarregar a página)
-    event.preventDefault();
-
-    const form = event.target;
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const originalText = submitBtn.textContent;
-    
-    // 2. Coleta os dados do formulário
-    const templateParams = {
-        from_name: form.nome.value,
-        from_email: form.email.value,
-        telefone: form.telefone.value,
-        servico: form.servico.value,
-        message: form.mensagem.value,
-    };
-
-    // 3. Validação básica
-    if (!templateParams.from_name || !templateParams.from_email || !templateParams.telefone || templateParams.servico === "" || !templateParams.message) {
-        showMessage('Por favor, preencha todos os campos obrigatórios.', 'error');
-        return;
-    }
-    if (!isValidEmail(templateParams.from_email)) {
-        showMessage('Por favor, insira um e-mail válido.', 'error');
-        return;
-    }
-    
-    // 4. Feedback visual e desabilita o botão
-    submitBtn.textContent = 'Enviando...';
-    submitBtn.disabled = true;
-
-    // 5. Envia o e-mail
-    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
-        .then(function(response) {
-            // Sucesso
-            console.log('SUCCESS!', response.status, response.text);
-            showMessage(`Obrigado, ${templateParams.from_name}! Sua mensagem foi enviada com sucesso. Entraremos em contato em breve.`, 'success');
-            form.reset(); // Limpa o formulário
-        }, function(error) {
-            // Falha
-            console.log('FAILED...', error);
-            showMessage('Falha ao enviar a mensagem. Por favor, tente novamente.', 'error');
-        })
-        .finally(function() {
-            // Restaura o botão
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-        });
-}
-
 
 // --- Funções Auxiliares (mantidas e adaptadas) ---
 
@@ -246,50 +174,11 @@ function scrollToSection(sectionId) {
     }
 }
 
-function showMessage(message, type) {
-    // Remove existing messages
-    const existingMessage = document.querySelector('.form-message');
-    if (existingMessage) {
-        existingMessage.remove();
-    }
-
-    // Create new message
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `form-message ${type}`;
-    messageDiv.textContent = message;
-
-    // Insert message after the form
-    const form = document.getElementById('contatoForm');
-    form.appendChild(messageDiv);
-
-    // Auto-remove success messages after 5 seconds
-    if (type === 'success') {
-        setTimeout(() => {
-            if (messageDiv.parentNode) {
-                messageDiv.remove();
-            }
-        }, 5000);
-    }
-}
-
 function openWhatsApp() {
     const phone = '5545999639218'; // Phone number with country code
     const message = encodeURIComponent('Olá! Gostaria de solicitar um orçamento para serviços de balanças.');
     const whatsappUrl = `https://wa.me/${phone}?text=${message}`;
     window.open(whatsappUrl, '_blank');
-}
-
-// Restante das funções auxiliares (isValidEmail, isValidPhone, animateCounter)
-function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-}
-
-function isValidPhone(phone) {
-    // Remove all non-numeric characters
-    const cleaned = phone.replace(/\D/g, '');
-    // Check if it has 10 or 11 digits (Brazilian format)
-    return cleaned.length >= 10 && cleaned.length <= 11;
 }
 
 function animateCounter(element, start, end, duration) {

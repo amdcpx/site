@@ -220,6 +220,13 @@
             <div class="contato-content">
                 
                 <form class="contato-form" id="contatoForm" action="https://formsubmit.co/rod.il@hotmail.com" method="POST">
+                    
+                    <input type="hidden" name="_next" value="https://amdcpx.github.io/site/?success=true">
+                    
+                    <input type="hidden" name="_template" value="box"> 
+                    
+                    <input type="hidden" name="_captcha" value="false">
+    
                     <div class="form-group">
                         <input type="text" id="nome" name="Nome" placeholder="Seu nome" required>
                     </div>
@@ -243,6 +250,10 @@
                     </div>
                     <button type="submit" class="btn-primary">Enviar Mensagem</button>
                 </form>
+
+                <div id="status-message" style="display: none; padding: 15px; border-radius: 8px; margin-top: 20px; background-color: #d1eddd; color: #0f5132; border: 1px solid #badbcc; font-weight: bold;">
+                    Sua mensagem foi enviada com sucesso! Em breve entraremos em contato.
+                </div>
                 
                 <div class="contato-info">
                     <div class="map-container">

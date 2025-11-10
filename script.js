@@ -199,4 +199,24 @@ function animateCounter(element, start, end, duration) {
     };
     requestAnimationFrame(step);
 }
+
+// --- NOVO CÓDIGO PARA TRATAR O SUCESSO DO FORMSUBMIT ---
+
+// Verifica se a URL contém '?success=true' após o envio do formulário
+const params = new URLSearchParams(window.location.search);
+if (params.get('success') === 'true') {
+    const messageDiv = document.getElementById('status-message');
+    if (messageDiv) {
+        // Exibe a mensagem de sucesso
+        messageDiv.style.display = 'block';
+        
+        // Remove o parâmetro 'success' da URL (para que a mensagem não apareça em um recarregamento)
+        // Isso evita que o FormSubmit envie a mensagem novamente
+        history.pushState(null, '', window.location.pathname + window.location.hash);
+
+        // Faz o scroll para a seção de contato para o usuário ver a mensagem
+        scrollToSection('contato'); 
+    }
+}
+
 }); // Fim da função DOMContentLoaded

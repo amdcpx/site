@@ -199,3 +199,5 @@ function animateCounter(element, start, end, duration) {
     };
     requestAnimationFrame(step);
 }
+// Final da função DOMContentLoaded
+}); // <-- Chave de fechamento ausente
